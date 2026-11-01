@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Oblique">
+<meta name="theme-color" content="#111111">
+<title>Oblique Strategies</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" sizes="180x180"
+      href="apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml"
+      href="apple-touch-icon.svg">
+<style>
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #11110f;
+  color: #e8e3d8;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
+  font-family: 'Special Elite', 'Courier New', monospace;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.stage {
+  perspective: 1200px;
+  width: min(88vw, 380px);
+  flex-shrink: 0;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  aspect-ratio: 3 / 2;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 1.4s cubic-bezier(.3,.7,.3,1);
+}
+
+.card.up {
+  transform: rotateY(180deg);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 35px rgba(0,0,0,.55);
+}
+
+.back {
+  background: #20201d;
+  border: 1px solid #444139;
+}
+
+.back::after {
+  content: "";
+  width: 24px;
+  height: 24px;
+  border: 1px solid #777064;
+  transform: rotate(45deg);
+}
+
+.front {
+  background-color: #e9e1cd;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E"),
+    linear-gradient(135deg, #eee7d5, #ded4bc);
+
+  color: #25231e;
+  transform: rotateY(180deg);
+  padding: 26px 28px;
+  text-align: center;
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: 21px;
+  line-height: 1.4;
+  white-space: pre-line;
+  border: 1px solid #c8bda5;
+  text-shadow: 0.3px 0.3px rgba(0,0,0,.15);
+}
+
+.front i {
+  font-style: normal;
+  opacity: .8;
+}
+
+button {
+  margin-top: 44px;
+  padding: 10px 14px;
+  min-width: 190px;
+  height: 48px;
+  background: none;
+  color: #b9ad98;
+  border: none;
+  border-radius: 0;
+  font: italic 15px 'Special Elite', monospace;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: color .3s ease, opacity .3s ease;
+}
+
+button:hover {
+  color: #eee5d4;
+}
+
+button:active {
+  opacity: .6;
+}
+
+button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+#countdown {
+  margin-top: 20px;
+  height: 18px;
+  line-height: 18px;
+  font: 12px 'Special Elite', monospace;
+  color: #888477;
+  letter-spacing: .08em;
+  text-align: center;
+  white-space: nowrap;
+}
+/* Opening popup */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(10,10,9,.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  transition: opacity .5s ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.popup {
+  text-align: center;
+  max-width: 320px;
+}
+
+.popup h2 {
+  font: 23px 'Special Elite', monospace;
+  font-weight: normal;
+  color: #e8e1d2;
+  margin-bottom: 18px;
+}
+
+.popup p {
+  font: 13px 'Special Elite', monospace;
+  color: #918b7e;
+  line-height: 1.9;
+  margin-bottom: 22px;
+}
+
+.popup button {
+  margin-top: 4px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: #b9ad98;
+  font: italic 14px 'Special Elite', monospace;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: color .3s ease;
+}
+
+.popup button:hover {
+  color: #eee5d4;
+}
+</style>
+</head>
+<body>
+  
+<div class="stage">
+  <div class="card" id="card">
+    <div class="face back"></div>
+    <div class="face front" id="text"></div>
+  </div>
+</div>
+
+<button id="btn">DRAW A CARD</button>
+
+<div id="countdown"></div>
+
+<!-- Opening popup -->
+
+<div class="overlay" id="overlay">
+  <div class="popup">
+    <h2>Oblique Strategies</h2>
+    <button id="readyBtn">I'M READY</button>
+  </div>
+</div>
+
+
+<script>
+const prompts = [
+"Abandon normal instruments",
+"Accept advice",
+"Accretion",
+"A line has two sides",
+"Allow an easement (an easement is the abandonment of a stricture)",
+"Are there sections? Consider transitions",
+"Ask people to work against their better judgment",
+"Ask your body",
+"Assemble some of the instruments in a group and treat the group",
+"Balance the consistency principle with the inconsistency principle",
+"Be dirty",
+"Breathe more deeply",
+"Bridges \n- build \n- burn",
+"Cascades",
+"Change instrument roles",
+"Change nothing and continue with immaculate consistency",
+"Children's voices \n- speaking \n- singing",
+"Cluster analysis",
+"Consider different fading systems",
+"Consult other sources \n- promising \n- unpromising",
+"Convert a melodic element into a rhythmic element",
+"Courage!",
+"Cut a vital connection",
+"Decorate, decorate",
+"Define an area as 'safe' and use it as an anchor",
+"Destroy \n- nothing \n- the most important thing",
+"Discard an axiom",
+"Disconnect from desire",
+"Discover the recipes you are using and abandon them",
+"Distorting time",
+"Do nothing for as long as possible",
+"Don't be afraid of things because they're easy to do",
+"Don't be frightened of cliches",
+"Don't be frightened to display your talents",
+"Don't break the silence",
+"Don't stress one thing more than another",
+"Do something boring",
+"Do the washing up",
+"Do the words need changing?",
+"Do we need holes?",
+"Emphasize differences",
+"Emphasize repetitions",
+"Emphasize the flaws",
+"Faced with a choice, do both",
+"Feedback recordings into an acoustic situation",
+"Fill every beat with something",
+"Get your neck massaged",
+"Ghost echoes",
+"Give the game away",
+"Give way to your worst impulse",
+"Go slowly all the way round the outside",
+"Honor thy error as a hidden intention",
+"How would you have done it?",
+"Humanize something free of error",
+"Imagine the music as a moving chain or caterpillar",
+"Imagine the music as a set of disconnected events",
+"Infinitesimal gradations",
+"Intentions \n- credibility of \n- nobility of \n- humility of",
+"Into the impossible",
+"Is it finished?",
+"Is there something missing?",
+"Is the tuning appropriate?",
+"Just carry on",
+"Left channel, right channel, center channel",
+"Listen in total darkness, or in a very large room, very quietly",
+"Listen to the quiet voice",
+"Look at a very small object; look at its center",
+"Look at the order in which you do things",
+"Look closely at the most embarrassing details and amplify them",
+"Lowest common denominator check -single beat -single note -single riff",
+"Make a blank valuable by putting it in an exquisite frame",
+"Make an exhaustive list of everything you might do and do the last thing on the list",
+"Make a sudden, destructive, unpredictable action; incorporate",
+"Mechanicalize something idiosyncratic",
+"Mute and continue",
+"Only one element of each kind",
+"(Organic) machinery",
+"Overtly resist change",
+"Put in earplugs",
+"Remember those quiet evenings",
+"Remove ambiguities and convert to specifics",
+"Remove specifics and convert to ambiguities",
+"Repetition is a form of change",
+"Reverse",
+"Short circuit",
+"improve his virility shovels them straight into his lap)",
+"Shut the door and listen from outside",
+"Simple subtraction",
+"Spectrum analysis",
+"Take a break",
+"Take away the elements in order of apparent non-importance",
+"Tape your mouth",
+"The inconsistency principle",
+"The tape is now the music",
+"Think of the radio",
+"Tidy up",
+"Trust in the you of now",
+"Turn it upside down",
+"Twist the spine",
+"Use an old idea",
+"Use an unacceptable color",
+"Use fewer notes",
+"Use filters",
+"Use 'unqualified' people",
+"Water",
+"What are you really thinking about just now? Incorporate",
+"What is the reality of the situation?",
+"What mistakes did you make last time?",
+"What would your closest friend do?",
+"What wouldn't you do?",
+"Work at a different speed",
+"You are an engineer",
+"You can only make one dot at a time",
+"You don't have to be ashamed of using your own ideas"
+];
+
+
+const card = document.getElementById('card');
+const text = document.getElementById('text');
+const btn = document.getElementById('btn');
+const countdown = document.getElementById('countdown');
+const overlay = document.getElementById('overlay');
+const readyBtn = document.getElementById('readyBtn');
+
+const LOCK_TIME = 24 * 60 * 60 * 1000;
+const STORAGE_KEY = 'obliqueLastDraw';
+
+let deck = [];
+let busy = false;
+let last = null;
+let timerInterval = null;
+
+function draw() {
+  if (!deck.length) {
+    deck = prompts.slice();
+
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+
+    if (deck[deck.length - 1] === last) {
+      deck.unshift(deck.pop());
+    }
+  }
+
+  last = deck.pop();
+  return last;
+}
+
+function show() {
+  const prompt = draw();
+
+  // Save the card immediately
+  localStorage.setItem('obliqueSavedCard', prompt);
+  localStorage.setItem(STORAGE_KEY, Date.now().toString());
+
+  // Display the card
+  text.innerHTML = prompt.split('\n').map(line => {
+    if (line.trim().startsWith('-')) {
+      return '<i>' + line.trim() + '</i>';
+    }
+    return line;
+  }).join('<br>');
+
+  requestAnimationFrame(() => {
+    card.classList.add('up');
+  });
+
+  updateCountdown();
+}
+// Check whether 24 hours have passed
+
+function remainingTime() {
+  const lastDraw = Number(localStorage.getItem(STORAGE_KEY));
+
+  if (!lastDraw) return 0;
+
+  return Math.max(0, LOCK_TIME - (Date.now() - lastDraw));
+}
+
+// Countdown display
+
+function updateCountdown() {
+  const remaining = remainingTime();
+
+  if (remaining <= 0) {
+    btn.disabled = false;
+    btn.textContent = 'DRAW A CARD';
+    countdown.textContent = '';
+    clearInterval(timerInterval);
+    timerInterval = null;
+    return;
+  }
+
+  btn.disabled = true;
+
+  const hours = Math.floor(remaining / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+
+  btn.textContent = '';
+
+  countdown.textContent =
+    'NEXT CARD IN ' +
+    String(hours).padStart(2, '0') + ':' +
+    String(minutes).padStart(2, '0') + ':' +
+    String(seconds).padStart(2, '0');
+
+  if (!timerInterval) {
+    timerInterval = setInterval(updateCountdown, 1000);
+  }
+}
+
+// Opening popup
+
+readyBtn.addEventListener('click', () => {
+  overlay.classList.add('hidden');
+});
+
+// Draw a card
+
+btn.addEventListener('click', () => {
+  if (busy || remainingTime() > 0) return;
+
+  busy = true;
+  btn.disabled = true;
+
+  if (card.classList.contains('up')) {
+    card.classList.remove('up');
+
+    setTimeout(() => {
+      show();
+
+      setTimeout(() => {
+        busy = false;
+        updateCountdown();
+      }, 700);
+
+    }, 700);
+
+  } else {
+    show();
+
+
+    setTimeout(() => {
+      busy = false;
+      updateCountdown();
+    }, 700);
+  }
+});
+
+if (remainingTime() > 0) {
+  timerInterval = setInterval(updateCountdown, 1000);
+}
+function restoreCard() {
+  const savedCard = localStorage.getItem('obliqueSavedCard');
+
+  if (savedCard) {
+    last = savedCard;
+
+    text.innerHTML = savedCard.split('\n').map(line => {
+      if (line.trim().startsWith('-')) {
+        return '<i>' + line.trim() + '</i>';
+      }
+      return line;
+    }).join('<br>');
+
+    card.classList.add('up');
+  }
+}
+
+// Initialise
+
+restoreCard();
+updateCountdown();
+
+</script>
+</body>
+</html>
