@@ -413,13 +413,21 @@ function updateCountdown() {
   const remaining = remainingTime();
 
   if (remaining <= 0) {
-    btn.disabled = false;
-    btn.textContent = 'DRAW A CARD';
-    countdown.textContent = '';
-    clearInterval(timerInterval);
-    timerInterval = null;
-    return;
-  }
+  btn.disabled = false;
+  btn.textContent = 'DRAW A CARD';
+  countdown.textContent = '';
+
+  // Remove the displayed card
+  card.classList.remove('up');
+  text.innerHTML = '';
+
+  // Remove the saved card
+  localStorage.removeItem('obliqueSavedCard');
+
+  clearInterval(timerInterval);
+  timerInterval = null;
+  return;
+}
 
   btn.disabled = true;
 
