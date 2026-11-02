@@ -5,4 +5,8 @@
         fill="none"
         stroke="#e9e1cd"
         stroke-width="1.5"/>
+  <path d="M90 -35 L215 90 L90 215 L-35 90 Z"
+        fill="none"
+        stroke="#e9e1cd"
+        stroke-width="1.5"/>
 </svg>
